@@ -14,45 +14,26 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
- WiFi101OTA version Feb 2017
- by Sandeep Mistry (Arduino)
- modified for ArduinoOTA Dec 2018
- by Juraj Andrassy
 */
 
-#ifndef _INTERNAL_STORAGE_H_INCLUDED
-#define _INTERNAL_STORAGE_H_INCLUDED
+#if defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_NRF5)
 
-#include "OTAStorage.h"
+#include <Arduino.h>
 
-class InternalStorageClass : public OTAStorage {
-public:
+#include "InternalStorageTwoStage.h"
 
-  InternalStorageClass();
+	//InternalStorageClass(126976, 135168)
 
-  virtual int open(int length);
-  virtual size_t write(uint8_t);
-  virtual void close();
-  virtual void clear();
-  virtual void apply();
-  virtual long maxSize();
+InternalStorageStageOne::InternalStorageStageOne(size_t firstStageSize)
+{
+	MAX_PARTIONED_SKETCH_SIZE = MAX_FLASH - SKETCH_START_ADDRESS - firstStageSize;
+	STORAGE_START_ADDRESS = SKETCH_START_ADDRESS + firstStageSize;
+}
 
-  void debugPrint();
-
-protected:
-  uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
-
-private:
-  union {
-    uint32_t u32;
-    uint8_t u8[4];
-  } _addressData;
-
-  int _writeIndex;
-  uint32_t* _writeAddress;
-};
-
-extern InternalStorageClass InternalStorage;
+InternalStorageStageTwo::InternalStorageStageTwo(size_t firstStageSize) 
+{
+	MAX_PARTIONED_SKETCH_SIZE = firstStageSize;
+	STORAGE_START_ADDRESS = SKETCH_START_ADDRESS + firstStageSize;
+}
 
 #endif

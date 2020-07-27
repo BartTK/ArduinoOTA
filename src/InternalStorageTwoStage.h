@@ -14,45 +14,21 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
- WiFi101OTA version Feb 2017
- by Sandeep Mistry (Arduino)
- modified for ArduinoOTA Dec 2018
- by Juraj Andrassy
 */
 
-#ifndef _INTERNAL_STORAGE_H_INCLUDED
-#define _INTERNAL_STORAGE_H_INCLUDED
+#ifndef _INTERNAL_STORAGE_TWO_STAGE_H_INCLUDED
+#define _INTERNAL_STORAGE_TWO_STAGE_H_INCLUDED
 
-#include "OTAStorage.h"
+#include "InternalStorage.h"
 
-class InternalStorageClass : public OTAStorage {
+class InternalStorageStageOne : public InternalStorageClass {
 public:
-
-  InternalStorageClass();
-
-  virtual int open(int length);
-  virtual size_t write(uint8_t);
-  virtual void close();
-  virtual void clear();
-  virtual void apply();
-  virtual long maxSize();
-
-  void debugPrint();
-
-protected:
-  uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
-
-private:
-  union {
-    uint32_t u32;
-    uint8_t u8[4];
-  } _addressData;
-
-  int _writeIndex;
-  uint32_t* _writeAddress;
+  InternalStorageStageOne(size_t firstStageSize);
 };
 
-extern InternalStorageClass InternalStorage;
+class InternalStorageStageTwo : public InternalStorageClass {
+public:
+  InternalStorageStageTwo(size_t firstStageSize);
+};
 
 #endif

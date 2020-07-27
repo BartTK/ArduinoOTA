@@ -96,10 +96,15 @@ extern "C" {
   {
     uint32_t* d = (uint32_t*)dest;
     uint32_t* s = (uint32_t*)src;
-
-    eraseFlash(dest, length, pageSize);
+    int alreadyCleared = 0;
+    int sizeToClear = min(src - dest, length);
+    //eraseFlash(dest, length, pageSize);
 
     for (int i = 0; i < length; i += 4) {
+      if (alreadyCleared <= i) {
+		eraseFlash(dest + i, sizeToClear, pageSize);
+		alreadyCleared += sizeToClear;
+	  }
       *d++ = *s++;
 
       waitForReady();
